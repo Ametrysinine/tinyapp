@@ -11,12 +11,12 @@ const urlDatabase = {
 const generateRandomString = () => {
 
   // a-z, A-Z, 0-9
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'; 
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let output = '';
   let length = 0;
 
   // Generate random string
-  while (length < 6) { 
+  while (length < 6) {
     let randomChar = characters[Math.floor(Math.random() * characters.length)];
     output += randomChar;
     length += 1;
@@ -25,7 +25,7 @@ const generateRandomString = () => {
   const shortenedUrls = Object.keys(urlDatabase);
 
   // Repeat string generation if string is already taken
-  if (shortenedUrls.includes(output)) { 
+  if (shortenedUrls.includes(output)) {
     generateRandomString();
   }
 
@@ -54,14 +54,25 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-  const id = req.params.id;
-  const longURL = urlDatabase[id];
+
   const templateVars = {
-    id,
-    longURL,
+
+    // ID: shortened URL
+    id: req.params.id,
+    longURL: urlDatabase[req.params.id],
   };
 
   res.render('urls_show.ejs', templateVars);
+});
+
+// Redirect to shortened URL
+app.get("/u/:id", (req, res) => {
+  const longURL = urlDatabase[req.params.id];
+  if (longURL) {
+    res.redirect(longURL);
+  } else {
+    res.status(404).send("Invalid shortened URL");
+  }
 });
 
 app.get("/urls.json", (req, res) => {
@@ -69,10 +80,13 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
+
+  // Add new URL to 'database'
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = req.body.longURL;
 
-  res.send("Ok"); // Respond with 'Ok' (we will replace this)
+  // Redirect to shortened URL
+  res.status(200).redirect(`/urls/${shortURL}`);
 });
 
 app.listen(PORT, () => {
