@@ -80,7 +80,10 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-
+  if (!req.body.longURL) {
+    res.status(400).send("No input given");
+    return;
+  }
   // Add new URL to 'database'
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = req.body.longURL;
