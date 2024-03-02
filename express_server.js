@@ -36,6 +36,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.set("view engine", "ejs");
 
+// GET requests
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -79,6 +80,7 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
+// POST requests
 app.post("/urls", (req, res) => {
   if (!req.body.longURL) {
     res.status(400).send("No input given");
@@ -89,7 +91,14 @@ app.post("/urls", (req, res) => {
   urlDatabase[shortURL] = req.body.longURL;
 
   // Redirect to shortened URL
-  res.status(200).redirect(`/urls/${shortURL}`);
+  res.redirect(`/urls/${shortURL}`);
+});
+
+app.post("/urls/:id/delete", (req, res) => {
+  delete urlDatabase[req.params.id];
+
+  // Redirect to shortened URL
+  res.redirect("/urls/");
 });
 
 app.listen(PORT, () => {
