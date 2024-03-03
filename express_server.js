@@ -34,9 +34,9 @@ const generateRandomString = () => {
   return output;
 };
 
+// App dependencies
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-
 
 app.set("view engine", "ejs");
 
@@ -63,7 +63,6 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-
   const templateVars = {
 
     // ID: shortened URL
@@ -90,7 +89,6 @@ app.get("/urls.json", (req, res) => {
 });
 
 // POST requests
-
 app.post("/login", (req, res) => {
   if (!req.body.username) {
     res.status(400).send("No input given");
@@ -116,8 +114,6 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls");
 });
 
-
-
 app.post("/urls/:id", (req, res) => {
   if (!req.body.longURL) {
     res.status(400).send("No input given");
@@ -126,7 +122,7 @@ app.post("/urls/:id", (req, res) => {
 
   // Update url database with new URL
   urlDatabase[req.params.id] = req.body.longURL;
-  // Redirect to URL 'database'
+
   res.redirect(`/urls/`);
 });
 
@@ -150,8 +146,7 @@ app.post("/urls/:id/delete", (req, res) => {
   res.redirect("/urls/");
 });
 
-
-
+// ------------------------------- //
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
