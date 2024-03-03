@@ -69,6 +69,7 @@ app.get("/urls/:id", (req, res) => {
 // Redirect to shortened URL
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id];
+  
   if (longURL) {
     res.redirect(longURL);
   } else {
@@ -81,6 +82,19 @@ app.get("/urls.json", (req, res) => {
 });
 
 // POST requests
+
+app.post("/urls/:id", (req, res) => {
+  if (!req.body.longURL) {
+    res.status(400).send("No input given");
+    return;
+  }
+
+  // Update url database with new URL
+  urlDatabase[req.params.id] = req.body.longURL;
+  // Redirect to URL 'database'
+  res.redirect(`/urls/`);
+});
+
 app.post("/urls", (req, res) => {
   if (!req.body.longURL) {
     res.status(400).send("No input given");
@@ -100,6 +114,8 @@ app.post("/urls/:id/delete", (req, res) => {
   // Redirect to shortened URL
   res.redirect("/urls/");
 });
+
+
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);

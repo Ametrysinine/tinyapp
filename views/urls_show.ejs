@@ -21,7 +21,7 @@
           Short URL ID: <a href="/u/<%= id %>"><%= id %></a>
         </p>
 
-        <form class="form-inline" action="/urls:id" method="POST">
+        <form class="form-inline" action="/urls/<%= id %>" method="POST">
           <div class="card-body">
             <label for="longURL">Enter a URL to update redirect link:</label>
             <input
