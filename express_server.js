@@ -51,8 +51,8 @@ app.get("/hello", (req, res) => {
 
 app.get("/urls", (req, res) => {
   const templateVars = {
-    username: req.cookies["Username"],
-    urls: urlDatabase, 
+    username: req.cookies["username"],
+    urls: urlDatabase,
   };
   console.log(templateVars);
   res.render('urls_index.ejs', templateVars);
@@ -92,7 +92,6 @@ app.get("/urls.json", (req, res) => {
 // POST requests
 
 app.post("/login", (req, res) => {
-  console.log(req.body);
   if (!req.body.username) {
     res.status(400).send("No input given");
     return;
@@ -104,10 +103,20 @@ app.post("/login", (req, res) => {
   }
 
   usernames.push(req.body.username);
-  res.cookie("Username", req.body.username);
+  res.cookie("username", req.body.username);
 
   res.redirect(`/urls/`);
 });
+
+app.post("/logout", (req, res) => {
+  if (req.cookies.username) {
+    res.clearCookie("username");
+  }
+  
+  res.redirect("/urls");
+});
+
+
 
 app.post("/urls/:id", (req, res) => {
   if (!req.body.longURL) {
