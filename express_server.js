@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 
+const usernames = [];
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
@@ -69,7 +70,7 @@ app.get("/urls/:id", (req, res) => {
 // Redirect to shortened URL
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id];
-  
+
   if (longURL) {
     res.redirect(longURL);
   } else {
@@ -82,6 +83,24 @@ app.get("/urls.json", (req, res) => {
 });
 
 // POST requests
+
+app.post("/login", (req, res) => {
+  console.log(req.body);
+  if (!req.body.username) {
+    res.status(400).send("No input given");
+    return;
+  }
+
+  if (usernames.includes(req.body.username)) {
+    res.status(409).send("Username is taken");
+    return;
+  }
+
+  usernames.push(req.body.username);
+  res.cookie("Username", req.body.username);
+
+  res.redirect(`/urls/`);
+});
 
 app.post("/urls/:id", (req, res) => {
   if (!req.body.longURL) {
