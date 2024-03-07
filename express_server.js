@@ -98,18 +98,28 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
-  if (!req.body.email || !req.body.password) {
+  const email = req.body.email;
+  const password = req.body.password;
+  if (!email || !password) {
     res.status(400).send("Email and/or password not given");
     return;
+  }
+
+  for (const user in users) {
+    if (users[user].email === email) {
+      res.status(409).send("Email already in use");
+      return;
+    }
   }
 
   const userID = generateRandomString();
   users[userID] = {
     userID,
-    email: req.body.email,
-    password: req.body.password,
+    email,
+    password,
   };
 
+  console.log(users);
   res.cookie("user_id", userID);
   res.redirect("/urls");
 });
@@ -124,10 +134,8 @@ app.post("/login", (req, res) => {
     return;
   }
 
-
-
   for (const user in users) {
-    if (users[user].email === email & users[user].password === password) {
+    if (users[user].email === email && users[user].password === password) {
       res.cookie("user_id", user);
       res.redirect("/urls");
       return;
