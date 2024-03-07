@@ -3,11 +3,14 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 
-const usernames = [];
+const users = {};
+const userIDs = Object.keys(users);
+
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+const shortenedUrls = Object.keys(urlDatabase);
 
 // Create 6-length random string
 const generateRandomString = () => {
@@ -24,10 +27,10 @@ const generateRandomString = () => {
     length += 1;
   }
 
-  const shortenedUrls = Object.keys(urlDatabase);
+
 
   // Repeat string generation if string is already taken
-  if (shortenedUrls.includes(output)) {
+  if (shortenedUrls.includes(output) || userIDs.includes(output)) {
     generateRandomString();
   }
 
@@ -54,11 +57,13 @@ app.get("/register", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
+  const userID = req.cookies.user_id;
+
   const templateVars = {
-    username: req.cookies["username"],
+    user: users[userID],
     urls: urlDatabase,
   };
-  console.log(templateVars);
+
   res.render('urls_index.ejs', templateVars);
 });
 
@@ -92,29 +97,54 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-// POST requests
-app.post("/login", (req, res) => {
-  if (!req.body.username) {
-    res.status(400).send("No input given");
+app.post("/register", (req, res) => {
+  if (!req.body.email || !req.body.password) {
+    res.status(400).send("Email and/or password not given");
     return;
   }
 
-  if (usernames.includes(req.body.username)) {
-    res.status(409).send("Username is taken");
-    return;
-  }
+  const userID = generateRandomString();
+  users[userID] = {
+    userID,
+    email: req.body.email,
+    password: req.body.password,
+  };
 
-  usernames.push(req.body.username);
-  res.cookie("username", req.body.username);
-
-  res.redirect(`/urls/`);
+  res.cookie("user_id", userID);
+  res.redirect("/urls");
 });
 
-app.post("/logout", (req, res) => {
-  if (req.cookies.username) {
-    res.clearCookie("username");
+// POST requests
+app.post("/login", (req, res) => {
+  const email = req.body.email;
+  const password = req.body.password;
+
+  if (!email || !password) {
+    res.status(400).send("No input given for email or password");
+    return;
   }
-  
+
+
+
+  for (const user in users) {
+    if (users[user].email === email & users[user].password === password) {
+      res.cookie("user_id", user);
+      res.redirect("/urls");
+      return;
+    }
+  }
+
+  res.status(418).send("Invalid input given for email or password");
+});
+
+
+
+
+app.post("/logout", (req, res) => {
+  if (req.cookies.user_id) {
+    res.clearCookie("user_id");
+  }
+
   res.redirect("/urls");
 });
 
