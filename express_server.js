@@ -52,10 +52,18 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
+  if (req.cookies.user_id) {
+    res.redirect("/urls");
+  }
+
   res.render("register");
 });
 
 app.get("/login", (req, res) => {
+  if (req.cookies.user_id) {
+    res.redirect("/urls");
+  }
+
   res.render("login");
 });
 
@@ -67,10 +75,13 @@ app.get("/urls", (req, res) => {
     urls: urlDatabase,
   };
 
-  res.render('urls_index.ejs', templateVars);
+  res.render("urls_index.ejs", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
+  if (!req.cookies.user_id) {
+    res.redirect("/login");
+  }
   const userID = req.cookies.user_id;
 
   const templateVars = {
@@ -166,6 +177,11 @@ app.post("/logout", (req, res) => {
 });
 
 app.post("/urls/:id", (req, res) => {
+  if (!req.cookies.user_id) {
+    res.status(401).send("Error: not logged in");
+    return;
+  }
+
   if (!req.body.longURL) {
     res.status(400).send("No input given");
     return;
