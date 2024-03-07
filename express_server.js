@@ -4,7 +4,6 @@ const app = express();
 const PORT = 8080; // default port 8080
 
 const users = {};
-const userIDs = Object.keys(users);
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -29,8 +28,8 @@ const generateRandomString = () => {
 
 
 
-  // Repeat string generation if string is already taken
-  if (shortenedUrls.includes(output) || userIDs.includes(output)) {
+  // Repeat string generation if string is already taken TODO: If userIDs is taken
+  if (shortenedUrls.includes(output) || users.hasOwnProperty(output)) {
     generateRandomString();
   }
 
@@ -54,6 +53,10 @@ app.get("/hello", (req, res) => {
 
 app.get("/register", (req, res) => {
   res.render("register");
+});
+
+app.get("/login", (req, res) => {
+  res.render("login");
 });
 
 app.get("/urls", (req, res) => {
@@ -101,7 +104,7 @@ app.post("/register", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   if (!email || !password) {
-    res.status(400).send("Email and/or password not given");
+    res.status(400).send("Email and/or password cannot be empty");
     return;
   }
 
