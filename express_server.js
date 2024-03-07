@@ -71,13 +71,23 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const userID = req.cookies.user_id;
+
+  const templateVars = {
+    user: users[userID],
+    urls: urlDatabase,
+  };
+
+  res.render('urls_new.ejs', templateVars);
 });
 
 app.get("/urls/:id", (req, res) => {
+  const userID = req.cookies.user_id;
+
   const templateVars = {
 
     // ID: shortened URL
+    user: users[userID],
     id: req.params.id,
     longURL: urlDatabase[req.params.id],
   };
@@ -145,7 +155,7 @@ app.post("/login", (req, res) => {
     }
   }
 
-  res.status(418).send("Invalid input given for email or password");
+  res.status(403).send("Invalid input given for email or password");
 });
 
 
@@ -156,7 +166,7 @@ app.post("/logout", (req, res) => {
     res.clearCookie("user_id");
   }
 
-  res.redirect("/urls");
+  res.redirect("/login");
 });
 
 app.post("/urls/:id", (req, res) => {
