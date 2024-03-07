@@ -158,13 +158,9 @@ app.post("/login", (req, res) => {
   res.status(403).send("Invalid input given for email or password");
 });
 
-
-
-
 app.post("/logout", (req, res) => {
-  if (req.cookies.user_id) {
-    res.clearCookie("user_id");
-  }
+
+  res.clearCookie("user_id");
 
   res.redirect("/login");
 });
