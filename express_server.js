@@ -107,7 +107,7 @@ app.post("/register", (req, res) => {
 
   for (const user in users) {
     if (users[user].email === email) {
-      res.status(409).send("Email already in use");
+      res.status(400).send("Email already in use");
       return;
     }
   }
