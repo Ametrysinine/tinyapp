@@ -10,8 +10,8 @@ const PORT = 8080; // default port 8080
 const users = {};
 
 const urls = {
-  "b2xVn2": {longURL: "http://www.lighthouselabs.ca", userID: "admin"},
-  "9sm5xK": {longURL: "http://www.google.com", userID: "admin"},
+  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "admin" },
+  "9sm5xK": { longURL: "http://www.google.com", userID: "admin" },
 };
 
 const shortenedUrls = Object.keys(urls);
@@ -58,6 +58,8 @@ const generateRandomString = () => {
 
 // App dependencies
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
 app.use(cookieSession({
   name: 'session',
   keys: ['defaultKey'/* secret keys */],
@@ -127,6 +129,12 @@ app.get("/urls/:id", (req, res) => {
 
   if (!user) {
     res.redirect("/login");
+    return;
+  }
+
+  if (!shortenedUrls.includes(urlID)) {
+    res.status(404).send("URL not found");
+    return;
   }
 
   if (url.userID !== user) {
@@ -169,11 +177,9 @@ app.post("/register", (req, res) => {
     return;
   }
 
-  for (const user in users) {
-    if (users[user].email === email) {
-      res.status(400).send("Email already in use");
-      return;
-    }
+  if (getUserByEmail(email)) {
+    res.status(400).send("Email already in use");
+    return;
   }
 
   const userID = generateRandomString();
@@ -253,19 +259,19 @@ app.post("/urls", (req, res) => {
   const userID = req.session.user_id;
   const longURL = req.body.longURL;
 
-  
+
   if (!userID) {
     res.status(401).send("Error: not logged in, login at /login");
     return;
   }
-  
+
   if (!longURL) {
     res.status(400).send("No input given");
     return;
   }
   // Add new URL to 'database'
   const urlID = generateRandomString();
-  const newUrl = {longURL, userID};
+  const newUrl = { longURL, userID };
 
   urls[urlID] = newUrl;
 
