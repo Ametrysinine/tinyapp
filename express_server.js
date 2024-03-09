@@ -186,7 +186,7 @@ app.post("/urls/:id", (req, res) => {
   const longURL = req.body.longURL;
 
   if (!userID) {
-    res.status(401).send("Error: not logged in");
+    res.status(401).send("Error: not logged in, login at /login");
     return;
   }
 
@@ -207,6 +207,12 @@ app.post("/urls/:id", (req, res) => {
 app.post("/urls", (req, res) => {
   const userID = req.cookies.user_id;
   const longURL = req.body.longURL;
+
+  
+  if (!userID) {
+    res.status(401).send("Error: not logged in, login at /login");
+    return;
+  }
   
   if (!longURL) {
     res.status(400).send("No input given");
@@ -223,6 +229,12 @@ app.post("/urls", (req, res) => {
 });
 
 app.post("/urls/:id/delete", (req, res) => {
+  const userID = req.cookies.user_id;
+  
+  if (!userID) {
+    res.status(401).send("Error: not logged in, login at /login");
+    return;
+  }
   delete urls[req.params.id];
 
   res.redirect("/urls/");
