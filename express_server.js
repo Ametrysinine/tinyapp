@@ -1,6 +1,7 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const cookieSession = require('cookie-session');
+const { getUserByEmail } = require('./helpers');
 
 const app = express();
 const PORT = 8080; // default port 8080
@@ -14,6 +15,9 @@ const urls = {
 };
 
 const shortenedUrls = Object.keys(urls);
+
+// Helper functions
+
 const urlsForUser = function(userID) {
   const userUrls = {};
 
@@ -98,6 +102,7 @@ app.get("/urls", (req, res) => {
     userUrls,
   };
 
+  console.log(users);
   res.render("urls_index.ejs", templateVars);
 });
 
@@ -192,7 +197,7 @@ app.post("/login", (req, res) => {
   }
 
   for (const user in users) {
-    if (users[user].email === email && bcrypt.compareSync(password, users[user].password)) {
+    if (user === getUserByEmail(email, users) && bcrypt.compareSync(password, users[user].password)) {
       req.session.user_id = user;
       res.redirect("/urls");
       return;
