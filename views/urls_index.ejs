@@ -31,10 +31,10 @@
           </tr>
         </thead>
         <tbody>
-          <% for (const urlID in urls) { %>
+          <% for (const urlID in userUrls) { %>
             <tr>
               <td><%= urlID %></td>
-              <td><%= urls[urlID].longURL %></td>
+              <td><%= userUrls[urlID].longURL %></td>
               <td>
                 <form method="GET" action="/urls/<%= urlID %>/">      
                   <button style="color:blue"; type="submit">Edit</button>
