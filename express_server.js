@@ -1,5 +1,7 @@
 const cookieParser = require("cookie-parser");
 const express = require("express");
+const bcrypt = require("bcryptjs");
+
 const app = express();
 const PORT = 8080; // default port 8080
 
@@ -90,8 +92,6 @@ app.get("/urls", (req, res) => {
     userUrls,
   };
 
-  console.log(urls);
-
   res.render("urls_index.ejs", templateVars);
 });
 
@@ -134,11 +134,11 @@ app.get("/urls/:id", (req, res) => {
 
 // Redirect to shortened URL
 app.get("/u/:id", (req, res) => {
+  const urlID = req.params.id;
+  const url = urls[urlID].longURL;
 
-  const longURL = urls[req.params.id];
-
-  if (longURL) {
-    res.redirect(longURL);
+  if (url) {
+    res.redirect(url);
   } else {
     res.status(404).send("Invalid shortened URL");
   }
@@ -151,7 +151,7 @@ app.get("/urls.json", (req, res) => {
 // POST requests
 app.post("/register", (req, res) => {
   const email = req.body.email;
-  const password = req.body.password;
+  const password = bcrypt.hashSync(req.body.password, 10);
 
   if (!email || !password) {
     res.status(400).send("Email and/or password cannot be empty");
@@ -172,7 +172,6 @@ app.post("/register", (req, res) => {
     password,
   };
 
-  console.log(`Account created: ${users}`);
   res.cookie("user_id", userID);
   res.redirect("/urls");
 });
@@ -188,7 +187,7 @@ app.post("/login", (req, res) => {
   }
 
   for (const user in users) {
-    if (users[user].email === email && users[user].password === password) {
+    if (users[user].email === email && bcrypt.compareSync(password, users[user].password)) {
       res.cookie("user_id", user);
       res.redirect("/urls");
       return;
@@ -222,7 +221,7 @@ app.post("/urls/:id", (req, res) => {
   }
 
   if (!url) {
-    res.status(402).send("Invalid URL");
+    res.status(404).send("Invalid URL");
     return;
   }
 
@@ -237,7 +236,6 @@ app.post("/urls/:id", (req, res) => {
     userID,
   };
 
-  console.log(urls);
   res.redirect(`/urls/`);
 });
 
@@ -281,7 +279,7 @@ app.post("/urls/:id/delete", (req, res) => {
   }
 
   if (!url) {
-    res.status(402).send("Invalid URL");
+    res.status(404).send("Invalid URL");
     return;
   }
 
