@@ -46,8 +46,6 @@ const generateRandomString = () => {
     length += 1;
   }
 
-
-
   // Repeat string generation if string is already taken by urlID or userID
   if (shortenedUrls.includes(output) || users.hasOwnProperty(output)) {
     generateRandomString();
@@ -72,11 +70,7 @@ app.set("view engine", "ejs");
 
 // GET requests
 app.get("/", (req, res) => {
-  res.send("Hello!");
-});
-
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
+  res.redirect("/urls");
 });
 
 app.get("/register", (req, res) => {
