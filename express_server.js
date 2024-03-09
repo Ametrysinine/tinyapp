@@ -10,11 +10,10 @@ const PORT = 8080; // default port 8080
 const users = {};
 
 const urls = {
+  // Note: submitted longURLs **must** include protocol (http://, https://)
   "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "admin" },
   "9sm5xK": { longURL: "http://www.google.com", userID: "admin" },
 };
-
-const shortenedUrls = Object.keys(urls);
 
 // Helper functions
 
@@ -47,6 +46,8 @@ const generateRandomString = () => {
   }
 
   // Repeat string generation if string is already taken by urlID or userID
+  const shortenedUrls = Object.keys(urls);
+
   if (shortenedUrls.includes(output) || users.hasOwnProperty(output)) {
     generateRandomString();
   }
@@ -69,10 +70,6 @@ app.use(cookieSession({
 app.set("view engine", "ejs");
 
 // GET requests
-app.get("/", (req, res) => {
-  res.redirect("/urls");
-});
-
 app.get("/register", (req, res) => {
   if (req.session.user_id) {
     res.redirect("/urls");
@@ -102,10 +99,11 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  const user = req.session.user_id;
+  const user = users[req.session.user_id];
 
   if (!user) {
     res.redirect("/login");
+    return;
   }
 
   const templateVars = {
@@ -117,9 +115,10 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-  const user = req.session.user_id;
+  const user = users[req.session.user_id];
   const urlID = req.params.id;
   const url = urls[urlID];
+  const shortenedUrls = Object.keys(urls);
 
   if (!user) {
     res.redirect("/login");
@@ -131,7 +130,7 @@ app.get("/urls/:id", (req, res) => {
     return;
   }
 
-  if (url.userID !== user) {
+  if (url.userID !== user.userID) {
     res.status(401).send("You are not authorized to view this page.");
     return;
   }
@@ -152,6 +151,8 @@ app.get("/u/:id", (req, res) => {
 
   if (url) {
     res.redirect(url);
+    return;
+
   } else {
     res.status(404).send("Invalid shortened URL");
   }
@@ -159,6 +160,10 @@ app.get("/u/:id", (req, res) => {
 
 app.get("/urls.json", (req, res) => {
   res.json(urls);
+});
+
+app.get("/", (req, res) => {
+  res.redirect("/urls");
 });
 
 // POST requests
@@ -218,6 +223,7 @@ app.post("/urls/:id", (req, res) => {
   const userID = req.session.user_id;
   const urlID = req.params.id;
   const url = urls[urlID];
+  // Note: submitted longURLs **must** include protocol (http://, https://)
   const longURL = req.body.longURL;
 
   if (!userID) {
@@ -251,6 +257,7 @@ app.post("/urls/:id", (req, res) => {
 
 app.post("/urls", (req, res) => {
   const userID = req.session.user_id;
+  // Note: submitted longURLs **must** include protocol (http://, https://)
   const longURL = req.body.longURL;
 
 
@@ -266,9 +273,7 @@ app.post("/urls", (req, res) => {
 
   // Add new URL to 'database'
   const urlID = generateRandomString();
-  const newUrl = { longURL, userID };
-
-  urls[urlID] = newUrl;
+  urls[urlID] = { longURL, userID };
 
   // Redirect to shortened URL
   res.redirect(`/urls/${urlID}`);
