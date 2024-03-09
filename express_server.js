@@ -98,12 +98,12 @@ app.get("/urls", (req, res) => {
     userUrls,
   };
 
-  console.log(users);
   res.render("urls_index.ejs", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
   const user = req.session.user_id;
+
   if (!user) {
     res.redirect("/login");
   }
@@ -166,7 +166,7 @@ app.post("/register", (req, res) => {
   const email = req.body.email;
   const password = bcrypt.hashSync(req.body.password, 10);
 
-  if (!email || !password) {
+  if (!email || req.body.password === "") {
     res.status(400).send("Email and/or password cannot be empty");
     return;
   }
@@ -176,6 +176,7 @@ app.post("/register", (req, res) => {
     return;
   }
 
+  // Generate user object
   const userID = generateRandomString();
   users[userID] = {
     userID,
@@ -217,7 +218,6 @@ app.post("/urls/:id", (req, res) => {
   const userID = req.session.user_id;
   const urlID = req.params.id;
   const url = urls[urlID];
-
   const longURL = req.body.longURL;
 
   if (!userID) {
@@ -263,6 +263,7 @@ app.post("/urls", (req, res) => {
     res.status(400).send("No input given");
     return;
   }
+
   // Add new URL to 'database'
   const urlID = generateRandomString();
   const newUrl = { longURL, userID };
@@ -293,7 +294,7 @@ app.post("/urls/:id/delete", (req, res) => {
     return;
   }
 
-  delete urls[req.params.id];
+  delete urls[urlID];
 
   res.redirect("/urls/");
 });
