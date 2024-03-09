@@ -148,7 +148,7 @@ app.post("/register", (req, res) => {
     password,
   };
 
-  console.log(users);
+  console.log(`Account created: ${users}`);
   res.cookie("user_id", userID);
   res.redirect("/urls");
 });
@@ -219,18 +219,18 @@ app.post("/urls", (req, res) => {
     return;
   }
   // Add new URL to 'database'
-  const shortURL = generateRandomString();
-  urls[shortURL] = {longURL,
+  const urlID = generateRandomString();
+  urls[urlID] = {longURL,
     userID,
   };
 
   // Redirect to shortened URL
-  res.redirect(`/urls/${shortURL}`);
+  res.redirect(`/urls/${urlID}`);
 });
 
 app.post("/urls/:id/delete", (req, res) => {
   const userID = req.cookies.user_id;
-  
+
   if (!userID) {
     res.status(401).send("Error: not logged in, login at /login");
     return;
