@@ -308,5 +308,5 @@ app.post("/urls/:id/delete", (req, res) => {
 
 // ------------------------------- //
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
+  console.log(`Tinyapp listening on port ${PORT}!`);
 });
