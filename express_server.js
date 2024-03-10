@@ -73,6 +73,7 @@ app.set("view engine", "ejs");
 app.get("/register", (req, res) => {
   if (req.session.user_id) {
     res.redirect("/urls");
+    return;
   }
 
   res.render("register");
@@ -81,6 +82,7 @@ app.get("/register", (req, res) => {
 app.get("/login", (req, res) => {
   if (req.session.user_id) {
     res.redirect("/urls");
+    return;
   }
 
   res.render("login");
