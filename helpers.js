@@ -1,5 +1,4 @@
-const users = require('./data');
-const urls = require('./data');
+const { urls, users } = require('./data');
 
 // Helper functions
 const getUserByEmail = function(email, database) {
@@ -10,10 +9,8 @@ const getUserByEmail = function(email, database) {
   }
 };
 
-
 const urlsForUser = function(userID) {
   const userUrls = {};
-
   // Add url to userUrls if userID is a match, or public ID
   for (let url in urls) {
     if (urls[url].userID === userID || urls[url].userID === "public") {

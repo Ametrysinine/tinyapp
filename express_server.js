@@ -6,8 +6,7 @@ const {
   getUserByEmail,
   urlsForUser,
 } = require('./helpers');
-const users = require('./data');
-const urls = require('./data');
+const { urls, users } = require('./data');
 
 const app = express();
 const PORT = 8080; // default port 8080
@@ -28,26 +27,37 @@ app.set("view engine", "ejs");
 
 // GET requests
 app.get("/register", (req, res) => {
-  if (req.session.user_id) {
+  const user = users[req.session.user_id];
+
+  if (user) {
     res.redirect("/urls");
     return;
   }
+  const templateVars = { user };
 
-  res.render("register");
+  res.render("register", templateVars);
 });
 
 app.get("/login", (req, res) => {
-  if (req.session.user_id) {
+  const user = users[req.session.user_id];
+
+  if (user) {
     res.redirect("/urls");
     return;
   }
 
-  res.render("login");
+  const templateVars = { user };
+
+  res.render("login", templateVars);
 });
 
 app.get("/urls", (req, res) => {
   const user = users[req.session.user_id];
   const userUrls = urlsForUser(req.session.user_id);
+  if (!user) {
+    res.status(401).send("Not authorized; please login at /login or register at /register");
+    return;
+  }
 
   const templateVars = {
     user,
@@ -80,7 +90,7 @@ app.get("/urls/:id", (req, res) => {
   const shortenedUrls = Object.keys(urls);
 
   if (!user) {
-    res.redirect("/login");
+    res.status(401).send("Not authorized; please login at /login or register at /register");
     return;
   }
 
@@ -122,7 +132,7 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  res.redirect("/urls");
+  res.redirect("/login");
 });
 
 // POST requests
@@ -135,8 +145,8 @@ app.post("/register", (req, res) => {
     return;
   }
 
-  if (getUserByEmail(email)) {
-    res.status(400).send("Email already in use");
+  if (getUserByEmail(email, users) !== undefined) {
+    res.status(405).send("Email already in use");
     return;
   }
 
