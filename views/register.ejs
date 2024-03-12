@@ -1,8 +1,26 @@
-<main style="margin: 1em;">
-    <h3>Create username/password</h3>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+
+    <!-- Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+      integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
+      crossorigin="anonymous"
+    />
+    <title>TinyApp</title>
+  </head>
+  <%- include('partials/_header') %>
+    <body>
+      <br>
+    <h3>Create email/password to register</h3>
     <form class="form-inline" action="/register" method="POST">
       <div class="form-group mb-2">
-        <label for="email">Enter an email:</label>
+        <label for="email">Email:</label>
         <input
           class="form-control"
           type="email"
@@ -11,7 +29,7 @@
           style="width: 300px; margin: 1em"
         />
 
-        <label for="password">Enter a password:</label>
+        <label for="password">Password:</label>
         <input
           class="form-control"
           type="password"
@@ -22,4 +40,5 @@
         <button type="submit" class="btn btn-primary">Submit</button>
       </div>
     </form>
+    </body>
   </main>
