@@ -116,15 +116,14 @@ app.get("/urls/:id", (req, res) => {
 // Redirect to shortened URL
 app.get("/u/:id", (req, res) => {
   const urlID = req.params.id;
-  const url = urls[urlID].longURL;
 
-  if (url) {
-    res.redirect(url);
-    return;
-
-  } else {
+  if (!urls[urlID]) {
     res.status(404).send("Invalid shortened URL");
+    return;
   }
+
+  const url = urls[urlID].longURL;
+  res.redirect(url);
 });
 
 app.get("/urls.json", (req, res) => {
